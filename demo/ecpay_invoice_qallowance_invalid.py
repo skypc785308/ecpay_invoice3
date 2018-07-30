@@ -25,5 +25,5 @@ ecpay_invoice.Send['AllowanceNo'] = '2018071615286810' # 折讓編號
 # 4. 送出
 aReturn_Info = ecpay_invoice.Check_Out()
 # 5. 返回
-print aReturn_Info
-print aReturn_Info['RtnMsg']
+print (aReturn_Info)
+print (aReturn_Info['RtnMsg'])

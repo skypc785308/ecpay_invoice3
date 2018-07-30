@@ -77,7 +77,7 @@ ecpay_invoice.Send['OnLine'] = False
 aReturn_Info = ecpay_invoice.Check_Out()
 
 # 5. 返回
-print 'RelateNumber：' + str(RelateNumber)
-print aReturn_Info
-print aReturn_Info['RtnMsg']
-print '發票號碼：' + aReturn_Info['InvoiceNumber']
+print ('RelateNumber：' + str(RelateNumber))
+print (aReturn_Info)
+print (aReturn_Info['RtnMsg'])
+print ('發票號碼：' + aReturn_Info['InvoiceNumber'])

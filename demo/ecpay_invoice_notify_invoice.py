@@ -27,5 +27,5 @@ ecpay_invoice.Send['Notified'] = 'C'
 # 4. 送出
 aReturn_Info = ecpay_invoice.Check_Out()
 # 5. 返回
-print aReturn_Info
-print aReturn_Info['RtnMsg']
+print (aReturn_Info)
+print (aReturn_Info['RtnMsg'])

@@ -20,7 +20,7 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     include_package_data=True,
-    license='BSD License',
+    license='Apache 2.0 License',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Operating System :: OS Independent',

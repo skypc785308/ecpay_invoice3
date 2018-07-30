@@ -22,5 +22,5 @@ ecpay_invoice.Send['RelateNumber'] = 'SocialOrder320180716015434'#  廠商自訂
 # 4. 送出
 aReturn_Info = ecpay_invoice.Check_Out()
 # 5. 返回
-print aReturn_Info
-print aReturn_Info['RtnMsg']
+print (aReturn_Info)
+print (aReturn_Info['RtnMsg'])

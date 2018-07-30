@@ -224,7 +224,7 @@ class ECPay_Invoice_Send():
         for key, val in arParameters.items():
             if key in urlencode_field:
                 arParameters[key] = ECPay_CheckMacValue.restore_str_replace(arParameters[key])
-                arParameters[key] = urllib.unquote_plus(val)
+                arParameters[key] = urllib.parse.unquote_plus(val)
 
         return arParameters
 '''

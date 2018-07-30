@@ -23,5 +23,5 @@ ecpay_invoice.Send['PayType'] = '2'        # 交易類別
 
 # 4. 送出
 aReturn_Info = ecpay_invoice.Check_Out()
-print aReturn_Info
-print aReturn_Info['RtnMsg']
+print (aReturn_Info)
+print (aReturn_Info['RtnMsg'])

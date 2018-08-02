@@ -62,7 +62,7 @@ class EcpayInvoiceMethod():
 
 
 # 電子發票載具類別
-class EcpayCarrierType():
+class EcpayCarruerType():
     # 無載具
     
     No = ''
@@ -307,14 +307,11 @@ class ECPay_CheckMacValue():
 
             sMacValue = urllib.parse.quote_plus(sorted_str)
 
-
             # 轉成小寫
             sMacValue = sMacValue.lower()
 
-
             # 取代為與 dotNet 相符的字元
             sMacValue = ECPay_CheckMacValue.do_str_replace(sMacValue)
-
 
             # 編碼
             if encType == ECPay_EncryptType.ENC_SHA256:

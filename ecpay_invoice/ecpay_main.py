@@ -6,13 +6,13 @@ import sys
 import re
 from ecpay_invoice.ecpay_setting import *
 
+
 class CustomException(Exception):
-   """Base class for other exceptions"""
-   pass
+    """Base class for other exceptions"""
+    pass
 
 
 class EcpayInvoice():
-
     TimeStamp = ''
     MerchantID = ''
     HashKey = ''
@@ -68,13 +68,16 @@ class EcpayInvoice():
         arParameters = self.Send.copy()
         arParameters['MerchantID'] = self.MerchantID
         arParameters['TimeStamp'] = self.TimeStamp
-        return ECPay_Invoice_Send.CheckOut(arParameters, self.HashKey, self.HashIV, self.Invoice_Method, self.Invoice_Url)
+        return ECPay_Invoice_Send.CheckOut(arParameters, self.HashKey, self.HashIV, self.Invoice_Method,
+                                           self.Invoice_Url)
+
 
 '''
 送出資訊
 '''
+
+
 class ECPay_Invoice_Send():
-    
     # 發票物件
     InvoiceObj = ''
     InvoiceObj_Return = ''
@@ -82,8 +85,9 @@ class ECPay_Invoice_Send():
     '''
     背景送出資料
     '''
+
     @staticmethod
-    def CheckOut(arParameters = dict, HashKey = '', HashIV = '', Invoice_Method = '', ServiceURL = ''):
+    def CheckOut(arParameters=dict, HashKey='', HashIV='', Invoice_Method='', ServiceURL=''):
         # 發送資訊處理
 
         arParameters = ECPay_Invoice_Send.process_send(arParameters, HashKey, HashIV, Invoice_Method, ServiceURL)
@@ -95,7 +99,7 @@ class ECPay_Invoice_Send():
 
     # 資料檢查與過濾(送出)
     @staticmethod
-    def process_send(arParameters = dict, HashKey = '', HashIV = '', Invoice_Method = '', ServiceURL = ''):
+    def process_send(arParameters=dict, HashKey='', HashIV='', Invoice_Method='', ServiceURL=''):
         # 宣告物件
         InvoiceMethod = 'ECPay_' + Invoice_Method
         class_str = globals()[InvoiceMethod]
@@ -111,15 +115,17 @@ class ECPay_Invoice_Send():
         # 5欄位例外處理方式(送壓碼前)
         arException = InvoiceObj.check_exception(arParameters)
         # 6產生壓碼
-        arParameters['CheckMacValue'] = ECPay_Invoice_Send.generate_checkmacvalue(arException, InvoiceObj.none_verification, HashKey, HashIV)
+        arParameters['CheckMacValue'] = ECPay_Invoice_Send.generate_checkmacvalue(arException,
+                                                                                  InvoiceObj.none_verification, HashKey,
+                                                                                  HashIV)
         return arParameters
-
 
     '''
     資料檢查與過濾(回傳)
     '''
+
     @staticmethod
-    def process_return(sParameters = '', HashKey = '', HashIV = '', Invoice_Method = ''):
+    def process_return(sParameters='', HashKey='', HashIV='', Invoice_Method=''):
         # 宣告物件
         InvoiceMethod = 'ECPay_' + Invoice_Method
         class_str = globals()[InvoiceMethod]
@@ -130,7 +136,8 @@ class ECPay_Invoice_Send():
         arException = InvoiceObj_Return.check_exception(arParameters)
         # 9產生壓碼(壓碼檢查)
         if 'CheckMacValue' in arParameters:
-            CheckMacValue = ECPay_Invoice_Send.generate_checkmacvalue(arException, InvoiceObj_Return.none_verification, HashKey, HashIV)
+            CheckMacValue = ECPay_Invoice_Send.generate_checkmacvalue(arException, InvoiceObj_Return.none_verification,
+                                                                      HashKey, HashIV)
             if CheckMacValue != arParameters['CheckMacValue']:
                 print('自己壓的：' + CheckMacValue)
                 print('系統回傳的：' + arParameters['CheckMacValue'])
@@ -139,12 +146,12 @@ class ECPay_Invoice_Send():
         arParameters = ECPay_Invoice_Send.urldecode_process(arParameters, InvoiceObj_Return.urlencode_field)
         return arParameters
 
-
     '''
     2檢查共同參數
     '''
+
     @staticmethod
-    def check_string(MerchantID = '', HashKey = '', HashIV = '', Invoice_Method = 'INVOICE', ServiceURL = ''):
+    def check_string(MerchantID='', HashKey='', HashIV='', Invoice_Method='INVOICE', ServiceURL=''):
         arErrors = list()
         # 檢查是否傳入動作方式
         if Invoice_Method == '' or Invoice_Method == 'Invoice_Method':
@@ -169,14 +176,16 @@ class ECPay_Invoice_Send():
         except CustomException:
             print(''.join(arErrors))
             raise
+
     '''
     *4處理需要轉換為urlencode的參數
     '''
+
     @staticmethod
     def urlencode_process(arParameters=dict, urlencode_field=dict):
         for key, val in arParameters.items():
             if key in urlencode_field:
-                arParameters[key] = urllib.parse.quote(val)
+                arParameters[key] = urllib.quote(val)
                 arParameters[key] = ECPay_CheckMacValue.do_str_replace(arParameters[key])
         return arParameters
 
@@ -185,7 +194,7 @@ class ECPay_Invoice_Send():
     '''
 
     @staticmethod
-    def generate_checkmacvalue(arParameters=dict, none_verification=dict, HashKey='', HashIV =''):
+    def generate_checkmacvalue(arParameters=dict, none_verification=dict, HashKey='', HashIV=''):
 
         sub_parameters = arParameters.copy()
         # 過濾不需要壓碼的參數
@@ -197,13 +206,12 @@ class ECPay_Invoice_Send():
         sCheck_MacValue = ECPay_CheckMacValue.generate(sub_parameters, HashKey, HashIV, ECPay_EncryptType.ENC_MD5)
         return sCheck_MacValue
 
-
     '''
     *7字串轉陣列
     '''
 
     @staticmethod
-    def string_to_array(Parameters = ''):
+    def string_to_array(Parameters=''):
         aParameters = dict()
         aParameters_Tmp = list()
 
@@ -215,21 +223,25 @@ class ECPay_Invoice_Send():
 
         return aParameters
 
-
     '''
     *10處理urldecode的參數
     '''
+
     @staticmethod
-    def urldecode_process(arParameters = dict, urlencode_field = dict):
+    def urldecode_process(arParameters=dict, urlencode_field=dict):
         for key, val in arParameters.items():
             if key in urlencode_field:
                 arParameters[key] = ECPay_CheckMacValue.restore_str_replace(arParameters[key])
-                arParameters[key] = urllib.parse.unquote_plus(val)
+                arParameters[key] = urllib.unquote_plus(val)
 
         return arParameters
+
+
 '''
 *  A一般開立 
 '''
+
+
 class ECPay_INVOICE():
     # 所需參數
     parameters = dict({
@@ -287,7 +299,8 @@ class ECPay_INVOICE():
     '''
     *1寫入參數
     '''
-    def insert_string(self, arParameters = dict):
+
+    def insert_string(self, arParameters=dict):
         nItems_Count_Total = 0
         nItems_Foreach_Count = 1
         sItemName = ''
@@ -322,19 +335,20 @@ class ECPay_INVOICE():
                     sItemAmount += '|'
                     sItemRemark += '|'
                 nItems_Foreach_Count += 1
-        self.parameters['ItemName'] = sItemName		# 商品名稱
+        self.parameters['ItemName'] = sItemName  # 商品名稱
         self.parameters['ItemCount'] = sItemCount
-        self.parameters['ItemWord'] = sItemWord		# 商品單位
+        self.parameters['ItemWord'] = sItemWord  # 商品單位
         self.parameters['ItemPrice'] = sItemPrice
         self.parameters['ItemTaxType'] = sItemTaxType
         self.parameters['ItemAmount'] = sItemAmount
-        self.parameters['ItemRemark'] = sItemRemark 	# 商品備註
+        self.parameters['ItemRemark'] = sItemRemark  # 商品備註
         return self.parameters
 
     '''
     *2 - 2驗證參數格式
     '''
-    def check_extend_string(self, arParameters = dict):
+
+    def check_extend_string(self, arParameters=dict):
 
         arErrors = list()
 
@@ -360,7 +374,8 @@ class ECPay_INVOICE():
         # 6.統一編號判斷CustomerIdentifier
         # * 若統一編號有值時，則固定長度為數字8碼
         if len(arParameters['CustomerIdentifier']) > 0:
-            if re.match("^[0-9]8$", arParameters['CustomerIdentifier']) == None:
+            print(len(arParameters['CustomerIdentifier']))
+            if re.match("^[0-9]{8}$", arParameters['CustomerIdentifier']) == None:
                 arErrors.append('6:CustomerIdentifier length should be 8.')
 
         # 7.客戶名稱CustomerName
@@ -394,15 +409,17 @@ class ECPay_INVOICE():
         # 10.客戶電子信箱CustomerEmail(UrlEncode, 預設為空字串, 與CustomerPhone擇一不可為空)
         # *預設最大長度為80碼
         if len(arParameters['CustomerEmail']) > 80:
-                arErrors.append("10:CustomerEmail max length as 80.")
+            arErrors.append("10:CustomerEmail max length as 80.")
         # *若客戶電子信箱有值時，則格式僅能為Email的標準格式
         if len(arParameters['CustomerEmail']) > 0:
-            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$', arParameters['CustomerEmail']) == None:
+            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$',
+                        arParameters['CustomerEmail']) == None:
                 arErrors.append('10:Invalid CustomerEmail Format.')
 
         # 9.10.
         #  *若客戶手機號碼為空值時，則客戶電子信箱不可為空值
-        if len(arParameters['CustomerPhone']) == 0 and len(arParameters['CustomerEmail']) == 0 and arParameters['OnLine']:
+        if len(arParameters['CustomerPhone']) == 0 and len(arParameters['CustomerEmail']) == 0 and arParameters[
+            'OnLine']:
             arErrors.append("9-10:CustomerPhone or CustomerEmail is required.")
 
         # 11.通關方式ClearanceMark(預設為空字串)
@@ -412,7 +429,8 @@ class ECPay_INVOICE():
 
         # *請設定空字串，僅課稅類別為零稅率(Zero)時，此參數不可為空字串
         if str(arParameters['TaxType']) == EcpayTaxType.Zero:
-            if arParameters['ClearanceMark'] != EcpayClearanceMark.Yes and arParameters['ClearanceMark'] != EcpayClearanceMark.No:
+            if arParameters['ClearanceMark'] != EcpayClearanceMark.Yes and arParameters[
+                'ClearanceMark'] != EcpayClearanceMark.No:
                 arErrors.append("11:ClearanceMark is required.")
         else:
             if len(arParameters['ClearanceMark']) > 0:
@@ -420,61 +438,64 @@ class ECPay_INVOICE():
         # 12.列印註記Print(預設為No)
         #  *列印註記僅能為0或1
         if arParameters['Print'] != EcpayPrintMark.Yes and arParameters['Print'] != EcpayPrintMark.No:
-                arErrors.append( "12:Invalid Print.")
+            arErrors.append("12:Invalid Print.")
         # *若捐贈註記 = '1'(捐贈)時，則VAL = '0'(不列印)
         if arParameters['Donation'] == EcpayDonation.Yes:
             if arParameters['Print'] != EcpayPrintMark.No:
-                arErrors.append( "12:Donation Print should be No.")
+                arErrors.append("12:Donation Print should be No.")
         # *若統一編號有值時，則VAL = '1'(列印)
         if len(arParameters['CustomerIdentifier']) > 0:
             if arParameters['Print'] != EcpayPrintMark.Yes:
-                arErrors.append( "12:CustomerIdentifier Print should be Yes.")
+                arErrors.append("12:CustomerIdentifier Print should be Yes.")
         # 線下列印判斷
         #  1200079當線下廠商開立發票無載具且無統一編號時，必須列印。
         if arParameters['OnLine'] == False:
-            if arParameters['CarruerType'] == EcpayCarrierType.No and len(arParameters['CustomerIdentifier']) == 0:
+            if arParameters['CarruerType'] == EcpayCarruerType.No and len(arParameters['CustomerIdentifier']) == 0:
                 if arParameters['Print'] != EcpayPrintMark.Yes:
-                    arErrors.append( "12:Offline Print should be Yes.")
+                    arErrors.append("12:Offline Print should be Yes.")
 
         # 13.捐贈註記Donation
         #  *固定給定下述預設值若為捐贈時，則VAL = '1'，若為不捐贈時，則VAL = '2'
         if arParameters['Donation'] != EcpayDonation.Yes and arParameters['Donation'] != EcpayDonation.No:
-            arErrors.append( "13:Invalid Donation.")
+            arErrors.append("13:Invalid Donation.")
         # *若統一編號有值時，則VAL = '2'(不捐贈)
         if len(arParameters['CustomerIdentifier']) > 0 and arParameters['Donation'] == EcpayDonation.Yes:
-            arErrors.append( "13:CustomerIdentifier Donation should be No.")
+            arErrors.append("13:CustomerIdentifier Donation should be No.")
 
         # 14.愛心碼LoveCode(預設為空字串)
         #  *若捐贈註記 = '1'(捐贈)時，則須有值
         if arParameters['Donation'] == EcpayDonation.Yes:
             if re.match("/^([xX]1[0-9]2,6|[0-9]3,7)$/", arParameters['LoveCode']) == None:
-                arErrors.append( "14:Invalid LoveCode.")
+                arErrors.append("14:Invalid LoveCode.")
         else:
             if len(arParameters['LoveCode']) > 0:
-                arErrors.append( "14:Please remove LoveCode.")
+                arErrors.append("14:Please remove LoveCode.")
 
         # 15.載具類別CarruerType(預設為None)
         # *固定給定下述預設值None、Member、Cellphone
-        if arParameters['CarruerType'] != EcpayCarrierType.No and arParameters['CarruerType'] != EcpayCarrierType.Member and arParameters['CarruerType'] != EcpayCarrierType.Citizen and arParameters['CarruerType'] != EcpayCarrierType.Cellphone:
+        if arParameters['CarruerType'] != EcpayCarruerType.No and arParameters[
+            'CarruerType'] != EcpayCarruerType.Member and arParameters['CarruerType'] != EcpayCarruerType.Citizen and \
+                arParameters['CarruerType'] != EcpayCarruerType.Cellphone:
             arErrors.append("15:Invalid CarruerType.")
         else:
             # * 統一編號不為空字串時，則載具類別不可為會載具或自然人憑證載具
             if len(arParameters['CustomerIdentifier']) > 0:
-                if arParameters['CarruerType'] == EcpayCarrierType.Member or arParameters['CarruerType'] == EcpayCarrierType.Citizen:
+                if arParameters['CarruerType'] == EcpayCarruerType.Member or arParameters[
+                    'CarruerType'] == EcpayCarruerType.Citizen:
                     arErrors.append("15:Invalid CarruerType.")
 
         # 16.載具編號CarruerNum(預設為空字串)
         # * 載具類別為無載具(None)或會員載具(Member)時，請設定空字串
-        if arParameters['CarruerType'] == EcpayCarrierType.No or arParameters['CarruerType'] == EcpayCarrierType.Member:
+        if arParameters['CarruerType'] == EcpayCarruerType.No or arParameters['CarruerType'] == EcpayCarruerType.Member:
             if len(arParameters['CarruerNum']) > 0:
                 arErrors.append("16:Please remove CarruerNum.")
         # *載具類別為買受人自然人憑證(Citizen)時，請設定自然人憑證號碼，前2碼為大小寫英文，後14碼為數字
-        elif arParameters['CarruerType'] == EcpayCarrierType.Citizen:
-            if re.match('/^[a-zA-Z]2\d14$/', arParameters['CarruerNum']) == None:
+        elif arParameters['CarruerType'] == EcpayCarruerType.Citizen:
+            if re.match('/^[a-zA-Z]{2}\d{14}$/', arParameters['CarruerNum']) == None:
                 arErrors.append("16:Invalid CarruerNum.")
         # *載具類別為買受人手機條碼(Cellphone)時，請設定手機條碼，第1碼為「 / 」，後7碼為大小寫英文、數字、「+」、「-」或「.」
-        elif arParameters['CarruerType'] == EcpayCarrierType.Cellphone:
-            if re.match('/^\/1[0-9a-zA-Z+-.]7$/', arParameters['CarruerNum']) == None:
+        elif arParameters['CarruerType'] == EcpayCarruerType.Cellphone:
+            if re.match('/^\/{1}[0-9a-zA-Z+-.]{7}$/', arParameters['CarruerNum']) == None:
                 arErrors.append("16:Invalid CarruerNum.")
         else:
             arErrors.append("16:Please remove CarruerNum.")
@@ -484,7 +505,9 @@ class ECPay_INVOICE():
         if len(str(arParameters['TaxType'])) == 0:
             arErrors.append("17:TaxType is required.")
         # *僅能為 1應稅 2零稅率 3免稅 9.應稅與免稅混合
-        if str(arParameters['TaxType']) != EcpayTaxType.Dutiable and str(arParameters['TaxType']) != EcpayTaxType.Zero and str(arParameters['TaxType']) != EcpayTaxType.Free and str(arParameters['TaxType']) != EcpayTaxType.Mix:
+        if str(arParameters['TaxType']) != EcpayTaxType.Dutiable and str(
+                arParameters['TaxType']) != EcpayTaxType.Zero and str(
+                arParameters['TaxType']) != EcpayTaxType.Free and str(arParameters['TaxType']) != EcpayTaxType.Mix:
             arErrors.append("17:Invalid TaxType.")
         # 18.發票金額SalesAmount
         # * 不可為空
@@ -521,11 +544,14 @@ class ECPay_INVOICE():
                     bError_Tag = True
                     arErrors.append('23:Invalid ItemPrice.')
                     break
+
+                # 檢查TaxType是否為'9'，並檢查是否有設定個別商品的課稅類別
                 bFind_Tag = str(val['ItemTaxType']).find('|')
                 if bFind_Tag != -1 or not val['ItemTaxType']:
-                    bError_Tag = True
-                    arErrors.append('24:Invalid ItemTaxType.')
-                    break
+                    if arParameters['TaxType'] == EcpayTaxType.Mix:
+                        bError_Tag = True
+                        arErrors.append('24:Invalid ItemTaxType.')
+                        break
                 bFind_Tag = str(val['ItemAmount']).find('|')
                 if bFind_Tag != -1 or val['ItemAmount'] < 0:
                     bError_Tag = True
@@ -551,10 +577,10 @@ class ECPay_INVOICE():
                     # 不是小數
                     if re.match('^[-+]?[0-9]*\.[0-9]+$', str(val['ItemPrice'])) == None:
                         # 又不是整數，跳出錯誤訊息
-                        if re.match('^[0-9]*$',str(val['ItemPrice'])) == None:
+                        if re.match('^[0-9]*$', str(val['ItemPrice'])) == None:
                             arErrors.append('23:Invalid ItemPrice.A')
                     # *ItemAmount數字判斷
-                    if re.match('^[-0-9]*$', str(val['ItemAmount']))== None:
+                    if re.match('^[-0-9]*$', str(val['ItemAmount'])) == None:
                         arErrors.append('25:Invalid ItemAmount.B')
                     # V1.0.3
                     #  * ItemRemark預設最大長度為40碼如果有此欄位才判斷
@@ -586,18 +612,22 @@ class ECPay_INVOICE():
 
         return arParameters
 
-
     '''
     *4欄位例外處理方式(送壓碼前)
     '''
-    def check_exception(self, arParameters = dict):
+
+    def check_exception(self, arParameters=dict):
         if 'CarruerNum' in arParameters:
             # 載具編號內包含 + 號則改為空白
             arParameters['CarruerNum'] = arParameters['CarruerNum'].replace('+', ' ')
         return arParameters
+
+
 '''
 *  B延遲開立
 '''
+
+
 class ECPay_INVOICE_DELAY():
     # 所需參數
     parameters = dict({
@@ -702,7 +732,8 @@ class ECPay_INVOICE_DELAY():
     '''
     *2 - 2驗證參數格式
     '''
-    def check_extend_string(self, arParameters = dict):
+
+    def check_extend_string(self, arParameters=dict):
 
         arErrors = list()
 
@@ -731,7 +762,7 @@ class ECPay_INVOICE_DELAY():
         # 6.統一編號判斷CustomerIdentifier
         # * 若統一編號有值時，則固定長度為數字8碼
         if len(arParameters['CustomerIdentifier']) > 0:
-            if re.match("^[0-9]8$", arParameters['CustomerIdentifier']) == None:
+            if re.match("^[0-9]{8}$", arParameters['CustomerIdentifier']) == None:
                 arErrors.append('6:CustomerIdentifier length should be 8.')
 
         # 7.客戶名稱CustomerName
@@ -765,15 +796,17 @@ class ECPay_INVOICE_DELAY():
         # 10.客戶電子信箱CustomerEmail(UrlEncode, 預設為空字串, 與CustomerPhone擇一不可為空)
         # *預設最大長度為80碼
         if len(arParameters['CustomerEmail']) > 80:
-                arErrors.append("10:CustomerEmail max length as 80.")
+            arErrors.append("10:CustomerEmail max length as 80.")
         # *若客戶電子信箱有值時，則格式僅能為Email的標準格式
         if len(arParameters['CustomerEmail']) > 0:
-            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$', arParameters['CustomerEmail']) == None:
+            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$',
+                        arParameters['CustomerEmail']) == None:
                 arErrors.append('10:Invalid CustomerEmail Format.')
 
         # 9.10.
         #  *若客戶手機號碼為空值時，則客戶電子信箱不可為空值
-        if len(arParameters['CustomerPhone']) == 0 and len(arParameters['CustomerEmail']) == 0 and arParameters['OnLine']:
+        if len(arParameters['CustomerPhone']) == 0 and len(arParameters['CustomerEmail']) == 0 and arParameters[
+            'OnLine']:
             arErrors.append("9-10:CustomerPhone or CustomerEmail is required.")
 
         # 11.通關方式ClearanceMark(預設為空字串)
@@ -783,7 +816,8 @@ class ECPay_INVOICE_DELAY():
 
         # *請設定空字串，僅課稅類別為零稅率(Zero)時，此參數不可為空字串
         if str(arParameters['TaxType']) == EcpayTaxType.Zero:
-            if arParameters['ClearanceMark'] != EcpayClearanceMark.Yes and arParameters['ClearanceMark'] != EcpayClearanceMark.No:
+            if arParameters['ClearanceMark'] != EcpayClearanceMark.Yes and arParameters[
+                'ClearanceMark'] != EcpayClearanceMark.No:
                 arErrors.append("11:ClearanceMark is required.")
         else:
             if len(arParameters['ClearanceMark']) > 0:
@@ -791,54 +825,57 @@ class ECPay_INVOICE_DELAY():
         # 12.列印註記Print(預設為No)
         #  *列印註記僅能為0或1
         if arParameters['Print'] != EcpayPrintMark.Yes and arParameters['Print'] != EcpayPrintMark.No:
-                arErrors.append( "12:Invalid Print.")
+            arErrors.append("12:Invalid Print.")
         # *若捐贈註記 = '1'(捐贈)時，則VAL = '0'(不列印)
         if arParameters['Donation'] == EcpayDonation.Yes:
             if arParameters['Print'] != EcpayPrintMark.No:
-                arErrors.append( "12:Donation Print should be No.")
+                arErrors.append("12:Donation Print should be No.")
         # *若統一編號有值時，則VAL = '1'(列印)
         if len(arParameters['CustomerIdentifier']) > 0:
             if arParameters['Print'] != EcpayPrintMark.Yes:
-                arErrors.append( "12:CustomerIdentifier Print should be Yes.")
+                arErrors.append("12:CustomerIdentifier Print should be Yes.")
         # 13.捐贈註記Donation
         #  *固定給定下述預設值若為捐贈時，則VAL = '1'，若為不捐贈時，則VAL = '2'
         if arParameters['Donation'] != EcpayDonation.Yes and arParameters['Donation'] != EcpayDonation.No:
-            arErrors.append( "13:Invalid Donation.")
+            arErrors.append("13:Invalid Donation.")
         # *若統一編號有值時，則VAL = '2'(不捐贈)
         if len(arParameters['CustomerIdentifier']) > 0 and arParameters['Donation'] == EcpayDonation.Yes:
-            arErrors.append( "13:CustomerIdentifier Donation should be No.")
+            arErrors.append("13:CustomerIdentifier Donation should be No.")
 
         # 14.愛心碼LoveCode(預設為空字串)
         #  *若捐贈註記 = '1'(捐贈)時，則須有值
         if arParameters['Donation'] == EcpayDonation.Yes:
-            if re.match("/^([xX]1[0-9]2,6|[0-9]3,7)$/", arParameters['LoveCode']) == None:
-                arErrors.append( "14:Invalid LoveCode.")
+            if re.match("/^([xX]{1}[0-9]{2,6}|[0-9]{3,7})$/", arParameters['LoveCode']) == None:
+                arErrors.append("14:Invalid LoveCode.")
         else:
             if len(arParameters['LoveCode']) > 0:
-                arErrors.append( "14:Please remove LoveCode.")
+                arErrors.append("14:Please remove LoveCode.")
 
         # 15.載具類別CarruerType(預設為None)
         # *固定給定下述預設值None、Member、Cellphone
-        if arParameters['CarruerType'] != EcpayCarrierType.No and arParameters['CarruerType'] != EcpayCarrierType.Member and arParameters['CarruerType'] != EcpayCarrierType.Citizen and arParameters['CarruerType'] != EcpayCarrierType.Cellphone:
+        if arParameters['CarruerType'] != EcpayCarruerType.No and arParameters[
+            'CarruerType'] != EcpayCarruerType.Member and arParameters['CarruerType'] != EcpayCarruerType.Citizen and \
+                arParameters['CarruerType'] != EcpayCarruerType.Cellphone:
             arErrors.append("15:Invalid CarruerType.")
         else:
             # * 統一編號不為空字串時，則載具類別不可為會載具或自然人憑證載具
             if len(arParameters['CustomerIdentifier']) > 0:
-                if arParameters['CarruerType'] == EcpayCarrierType.Member or arParameters['CarruerType'] == EcpayCarrierType.Citizen:
+                if arParameters['CarruerType'] == EcpayCarruerType.Member or arParameters[
+                    'CarruerType'] == EcpayCarruerType.Citizen:
                     arErrors.append("15:Invalid CarruerType.")
 
         # 16.載具編號CarruerNum(預設為空字串)
         # * 載具類別為無載具(None)或會員載具(Member)時，請設定空字串
-        if arParameters['CarruerType'] == EcpayCarrierType.No or arParameters['CarruerType'] == EcpayCarrierType.Member:
+        if arParameters['CarruerType'] == EcpayCarruerType.No or arParameters['CarruerType'] == EcpayCarruerType.Member:
             if len(arParameters['CarruerNum']) > 0:
                 arErrors.append("16:Please remove CarruerNum.")
         # *載具類別為買受人自然人憑證(Citizen)時，請設定自然人憑證號碼，前2碼為大小寫英文，後14碼為數字
-        elif arParameters['CarruerType'] == EcpayCarrierType.Citizen:
-            if re.match('/^[a-zA-Z]2\d14$/', arParameters['CarruerNum']) == None:
+        elif arParameters['CarruerType'] == EcpayCarruerType.Citizen:
+            if re.match('/^[a-zA-Z]{2}\d{14}$/', arParameters['CarruerNum']) == None:
                 arErrors.append("16:Invalid CarruerNum.")
         # *載具類別為買受人手機條碼(Cellphone)時，請設定手機條碼，第1碼為「 / 」，後7碼為大小寫英文、數字、「+」、「-」或「.」
-        elif arParameters['CarruerType'] == EcpayCarrierType.Cellphone:
-            if re.match('/^\/1[0-9a-zA-Z+-.]7$/', arParameters['CarruerNum']) == None:
+        elif arParameters['CarruerType'] == EcpayCarruerType.Cellphone:
+            if re.match('/^\/{1}[0-9a-zA-Z+-.]{7}$/', arParameters['CarruerNum']) == None:
                 arErrors.append("16:Invalid CarruerNum.")
         else:
             arErrors.append("16:Please remove CarruerNum.")
@@ -848,7 +885,9 @@ class ECPay_INVOICE_DELAY():
         if len(str(arParameters['TaxType'])) == 0:
             arErrors.append("17:TaxType is required.")
         # *僅能為 1應稅 2零稅率 3免稅 9.應稅與免稅混合
-        if str(arParameters['TaxType']) != EcpayTaxType.Dutiable and str(arParameters['TaxType']) != EcpayTaxType.Zero and str(arParameters['TaxType']) != EcpayTaxType.Free and str(arParameters['TaxType']) != EcpayTaxType.Mix:
+        if str(arParameters['TaxType']) != EcpayTaxType.Dutiable and str(
+                arParameters['TaxType']) != EcpayTaxType.Zero and str(
+                arParameters['TaxType']) != EcpayTaxType.Free and str(arParameters['TaxType']) != EcpayTaxType.Mix:
             arErrors.append("17:Invalid TaxType.")
         # 18.發票金額SalesAmount
         # * 不可為空
@@ -887,9 +926,10 @@ class ECPay_INVOICE_DELAY():
                     break
                 bFind_Tag = str(val['ItemTaxType']).find('|')
                 if bFind_Tag != -1 or not val['ItemTaxType']:
-                    bError_Tag = True
-                    arErrors.append('24:Invalid ItemTaxType.')
-                    break
+                    if arParameters['TaxType'] == EcpayTaxType.Mix:
+                        bError_Tag = True
+                        arErrors.append('24:Invalid ItemTaxType.')
+                        break
                 bFind_Tag = str(val['ItemAmount']).find('|')
                 if bFind_Tag != -1 or val['ItemAmount'] < 0:
                     bError_Tag = True
@@ -914,10 +954,10 @@ class ECPay_INVOICE_DELAY():
                     # *ItemPrice數字判斷
                     if re.match('^[-+]?[0-9]*\.[0-9]+$', str(val['ItemPrice'])) == None:
                         # 又不是整數，跳出錯誤訊息
-                        if re.match('^[0-9]*$',str(val['ItemPrice'])) == None:
+                        if re.match('^[0-9]*$', str(val['ItemPrice'])) == None:
                             arErrors.append('23:Invalid ItemPrice.A')
                     # *ItemAmount數字判斷
-                    if re.match('^[-0-9]*$', str(val['ItemAmount']))== None:
+                    if re.match('^[-0-9]*$', str(val['ItemAmount'])) == None:
                         arErrors.append('25:Invalid ItemAmount.B')
                     # V1.0.3
                     #  * ItemRemark預設最大長度為40碼如果有此欄位才判斷
@@ -930,20 +970,20 @@ class ECPay_INVOICE_DELAY():
         if arParameters['InvType'] != EcpayInvType.General and arParameters['InvType'] != EcpayInvType.Special:
             arErrors.append("27:Invalid InvType.")
         # 30.延遲註記DelayFlag
-        if arParameters['DelayFlag'] != EcpayDelayFlagType.Delay  and arParameters['DelayFlag'] != EcpayDelayFlagType.Trigger:
+        if arParameters['DelayFlag'] != EcpayDelayFlagType.Delay and arParameters[
+            'DelayFlag'] != EcpayDelayFlagType.Trigger:
             arErrors.append("30:Invalid DelayFlagType.")
 
-        # 31.延遲天數DelayDay
-        # 延遲天數，範圍0~15，設定為0時，付款完成後立即開立發票
+            # 31.延遲天數DelayDay
+            # 延遲天數，範圍0~15，設定為0時，付款完成後立即開立發票
 
-        # *DelayDay(不可為空, 預設為0)
+            # *DelayDay(不可為空, 預設為0)
             arParameters['DelayDay'] = int(arParameters['DelayDay'])
 
         # *若為延遲開立時，延遲天數須介於1至15天內
         if arParameters['DelayFlag'] == EcpayDelayFlagType.Delay:
 
             if int(arParameters['DelayDay']) < 1 or int(arParameters['DelayDay']) > 15:
-
                 arErrors.append("31:DelayDay should be 1 ~ 15.")
         # *若為觸發開立時，延遲天數須介於0至15天內
         if arParameters['DelayFlag'] == EcpayDelayFlagType.Trigger:
@@ -971,7 +1011,6 @@ class ECPay_INVOICE_DELAY():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -989,9 +1028,13 @@ class ECPay_INVOICE_DELAY():
             # 載具編號內包含 + 號則改為空白
             arParameters['CarruerNum'] = arParameters['CarruerNum'].replace('+', ' ')
         return arParameters
+
+
 '''
 *  C開立折讓
 '''
+
+
 class ECPay_ALLOWANCE():
     # 所需參數
     parameters = dict({
@@ -1075,6 +1118,7 @@ class ECPay_ALLOWANCE():
     '''
     * 2-2 驗證參數格式
     '''
+
     def check_extend_string(self, arParameters=dict):
         arErrors = list()
 
@@ -1116,9 +1160,10 @@ class ECPay_ALLOWANCE():
                     break
                 bFind_Tag = str(val['ItemTaxType']).find('|')
                 if bFind_Tag != -1 or not val['ItemTaxType']:
-                    bError_Tag = True
-                    arErrors.append('24:Invalid ItemTaxType.')
-                    break
+                    if arParameters['TaxType'] == EcpayTaxType.Mix:
+                        bError_Tag = True
+                        arErrors.append('24:Invalid ItemTaxType.')
+                        break
                 bFind_Tag = str(val['ItemAmount']).find('|')
                 if bFind_Tag != -1 or val['ItemAmount'] < 0:
                     bError_Tag = True
@@ -1137,7 +1182,7 @@ class ECPay_ALLOWANCE():
                     # *ItemPrice數字判斷
                     if re.match('^[-+]?[0-9]*\.[0-9]+$', str(val['ItemPrice'])) == None:
                         # 又不是整數，跳出錯誤訊息
-                        if re.match('^[0-9]*$',str(val['ItemPrice'])) == None:
+                        if re.match('^[0-9]*$', str(val['ItemPrice'])) == None:
                             arErrors.append('23:Invalid ItemPrice.A')
                     # *ItemAmount數字判斷
                     if re.match('^[-0-9]*$', str(val['ItemAmount'])) == None:
@@ -1153,15 +1198,16 @@ class ECPay_ALLOWANCE():
 
         # 38.通知類別AllowanceNotify
         # *固定給定下述預設值
-        if arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.Sms\
-                and arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.Email\
-                and arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.All\
+        if arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.Sms \
+                and arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.Email \
+                and arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.All \
                 and arParameters['AllowanceNotify'] != EcpayAllowanceNotifyType.No:
             arErrors.append('38:Invalid AllowanceNotifyType.')
         # 39.通知電子信箱 NotifyMail
         # *若客戶電子信箱有值時，則格式僅能為Email的標準格式
         if len(arParameters['NotifyMail']) > 0:
-            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$', arParameters['NotifyMail']) == None:
+            if re.match('^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$',
+                        arParameters['NotifyMail']) == None:
                 arErrors.append('39:Invalid Email Format.')
         # *下述情況通知電子信箱不可為空值(通知類別為E-電子郵件)
         if arParameters['AllowanceNotify'] == EcpayAllowanceNotifyType.Email \
@@ -1170,7 +1216,7 @@ class ECPay_ALLOWANCE():
         # 40.通知手機號碼 NotifyPhone
         # *若客戶手機號碼有值時，則預設格式為數字組成
         if len(arParameters['NotifyPhone']) > 0:
-            if re.match('/^[0-9]*$/',arParameters['NotifyPhone']) == None:
+            if re.match('/^[0-9]*$/', arParameters['NotifyPhone']) == None:
                 arErrors.append('40:Invalid NotifyPhone.')
         # * 最大20字元
         if len(arParameters['NotifyPhone']) > 20:
@@ -1186,13 +1232,13 @@ class ECPay_ALLOWANCE():
             arErrors.append('39-40:NotifyMail or NotifyPhone is required.')
         else:
             # *下述情況通知手機號碼與電子信箱不可為空值(通知類別為A-皆通知)
-            if arParameters['AllowanceNotify'] == EcpayAllowanceNotifyType.All and\
+            if arParameters['AllowanceNotify'] == EcpayAllowanceNotifyType.All and \
                     (len(arParameters['NotifyMail']) == 0 or
                      len(arParameters['NotifyPhone']) == 0):
                 arErrors.append('39-40:NotifyMail And NotifyPhone is required.')
             # *下述情況通知手機號碼與電子信箱為空值(通知類別為N-皆不通知)
-            if arParameters['AllowanceNotify'] == EcpayAllowanceNotifyType.No and\
-                    (len(arParameters['NotifyMail']) > 0 and len(arParameters['NotifyPhone']) > 0 ):
+            if arParameters['AllowanceNotify'] == EcpayAllowanceNotifyType.No and \
+                    (len(arParameters['NotifyMail']) > 0 and len(arParameters['NotifyPhone']) > 0):
                 arErrors.append('39-40:Please remove NotifyMail And NotifyPhone.')
 
         # 41.折讓單總金額 AllowanceAmount
@@ -1207,7 +1253,6 @@ class ECPay_ALLOWANCE():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1219,11 +1264,16 @@ class ECPay_ALLOWANCE():
     '''
     *4欄位例外處理方式(送壓碼前)
     '''
-    def check_exception(self, arParameters = dict):
+
+    def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  D發票作廢
 '''
+
+
 class ECPay_INVOICE_VOID():
     # 所需參數
     parameters = dict({
@@ -1259,6 +1309,7 @@ class ECPay_INVOICE_VOID():
     '''
     * 2-2 驗證參數格式
     '''
+
     def check_extend_string(self, arParameters=dict):
         arErrors = list()
         # 42.發票號碼 InvoiceNumber
@@ -1283,19 +1334,24 @@ class ECPay_INVOICE_VOID():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
         return arParameters
+
     '''
     * 4欄位例外處理方式(送壓碼前)
     '''
+
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  E折讓作廢
 '''
+
+
 class ECPay_ALLOWANCE_VOID():
     # 所需參數
     parameters = dict({
@@ -1332,6 +1388,7 @@ class ECPay_ALLOWANCE_VOID():
     '''
     * 2-2 驗證參數格式
     '''
+
     def check_extend_string(self, arParameters=dict):
 
         arErrors = list()
@@ -1364,7 +1421,6 @@ class ECPay_ALLOWANCE_VOID():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1376,9 +1432,13 @@ class ECPay_ALLOWANCE_VOID():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  F查詢發票
 '''
+
+
 class ECPay_INVOICE_SEARCH():
     # 所需參數
     parameters = dict({
@@ -1440,7 +1500,6 @@ class ECPay_INVOICE_SEARCH():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1455,9 +1514,13 @@ class ECPay_INVOICE_SEARCH():
         if 'IIS_Customer_Email' in arParameters:
             arParameters['IIS_Customer_Email'] = arParameters['IIS_Customer_Email'].replace('+', ' ')
         return arParameters
+
+
 '''
 *  G查詢作廢發票
 '''
+
+
 class ECPay_INVOICE_VOID_SEARCH():
     # 所需參數
     parameters = dict({
@@ -1510,7 +1573,6 @@ class ECPay_INVOICE_VOID_SEARCH():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1522,9 +1584,13 @@ class ECPay_INVOICE_VOID_SEARCH():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  H查詢折讓明細
 '''
+
+
 class ECPay_ALLOWANCE_SEARCH():
     # 所需參數
     parameters = dict({
@@ -1563,6 +1629,7 @@ class ECPay_ALLOWANCE_SEARCH():
     '''
     * 2-2 驗證參數格式
     '''
+
     def check_extend_string(self, arParameters=dict):
         arErrors = list()
 
@@ -1579,13 +1646,12 @@ class ECPay_ALLOWANCE_SEARCH():
             arErrors.append('44:AllowanceNo is required.')
         # *若有值長度固定16字元
         if len(arParameters['AllowanceNo']) != 0 and len(arParameters['AllowanceNo']) != 16:
-             arErrors.append('44:AllowanceNo length as 16.')
+            arErrors.append('44:AllowanceNo length as 16.')
 
         try:
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1597,9 +1663,13 @@ class ECPay_ALLOWANCE_SEARCH():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  I查詢折讓作廢明細
 '''
+
+
 class ECPay_ALLOWANCE_VOID_SEARCH():
     # 所需參數
     parameters = dict({
@@ -1658,7 +1728,6 @@ class ECPay_ALLOWANCE_VOID_SEARCH():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1670,9 +1739,13 @@ class ECPay_ALLOWANCE_VOID_SEARCH():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  J發送通知
 '''
+
+
 class ECPay_INVOICE_NOTIFY():
     # 所需參數
     parameters = dict({
@@ -1725,7 +1798,8 @@ class ECPay_INVOICE_NOTIFY():
             arErrors.append('37:InvoiceNo length as 10.')
 
         # 44.折讓編號 AllowanceNo
-        if arParameters['InvoiceTag'] == EcpayInvoiceTagType.Allowance or arParameters['InvoiceTag'] == EcpayInvoiceTagType.Allowance_Void:
+        if arParameters['InvoiceTag'] == EcpayInvoiceTagType.Allowance or arParameters[
+            'InvoiceTag'] == EcpayInvoiceTagType.Allowance_Void:
             if len(arParameters['AllowanceNo']) == 0:
                 arErrors.append('44:AllowanceNo is required.')
             # *若有值長度固定16字元
@@ -1735,7 +1809,8 @@ class ECPay_INVOICE_NOTIFY():
         # 45.NotifyMail 發送電子信箱
         # *若客戶電子信箱有值時，則格式僅能為Email的標準格式
         if len(arParameters['NotifyMail']) > 0:
-            if re.match("^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$", arParameters['NotifyMail']) == None:
+            if re.match("^[a-z0-9&\'\.\-_\+]+@[a-z0-9\-_]+\.([a-z0-9\-_]+\.)*?[a-z]+$",
+                        arParameters['NotifyMail']) == None:
                 arErrors.append('45:Invalid Email Format.')
 
         # *下述情況通知電子信箱不可為空值(發送方式為E-電子郵件)
@@ -1760,39 +1835,37 @@ class ECPay_INVOICE_NOTIFY():
         if len(arParameters['Phone']) == 0 and len(arParameters['NotifyMail']) == 0:
             arErrors.append('45-46:NotifyMail or Phone is required.')
         else:
-            if arParameters['Notify'] == EcpayNotifyType.All and\
+            if arParameters['Notify'] == EcpayNotifyType.All and \
                     (len(arParameters['NotifyMail']) == 0 or len(arParameters['Phone']) == 0):
                 arErrors.append('45-46:NotifyMail and Phone is required.')
 
-
         # 47. 發送方式 Notify
         # *固定給定下述預設值
-        if arParameters['Notify'] != EcpayNotifyType.Sms and\
-                arParameters['Notify'] != EcpayNotifyType.Email and\
+        if arParameters['Notify'] != EcpayNotifyType.Sms and \
+                arParameters['Notify'] != EcpayNotifyType.Email and \
                 arParameters['Notify'] != EcpayNotifyType.All:
             arErrors.append('47:Notify is required.')
 
         # 48.發送內容類型 InvoiceTag
         # *固定給定下述預設值
-        if arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice and\
-        arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice_Void and\
-        arParameters['InvoiceTag'] != EcpayInvoiceTagType.Allowance and\
-        arParameters['InvoiceTag'] != EcpayInvoiceTagType.Allowance_Void and\
-        arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice_Winning:
+        if arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice and \
+                arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice_Void and \
+                arParameters['InvoiceTag'] != EcpayInvoiceTagType.Allowance and \
+                arParameters['InvoiceTag'] != EcpayInvoiceTagType.Allowance_Void and \
+                arParameters['InvoiceTag'] != EcpayInvoiceTagType.Invoice_Winning:
             arErrors.append('48:InvoiceTag is required.')
 
         # 49.發送對象 Notified
         # *固定給定下述預設值
-        if arParameters['Notified'] != EcpayNotifiedType.Customer and\
-        arParameters['Notified'] != EcpayNotifiedType.vendor and\
-        arParameters['Notified'] != EcpayNotifiedType.All:
+        if arParameters['Notified'] != EcpayNotifiedType.Customer and \
+                arParameters['Notified'] != EcpayNotifiedType.vendor and \
+                arParameters['Notified'] != EcpayNotifiedType.All:
             arErrors.append('49:Notified is required.')
 
         try:
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1804,9 +1877,13 @@ class ECPay_INVOICE_NOTIFY():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  K付款完成觸發或延遲開立發票
 '''
+
+
 class ECPay_INVOICE_TRIGGER():
     # 所需參數
     parameters = dict({
@@ -1863,7 +1940,6 @@ class ECPay_INVOICE_TRIGGER():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1875,9 +1951,13 @@ class ECPay_INVOICE_TRIGGER():
 
     def check_exception(self, arParameters=dict):
         return arParameters
+
+
 '''
 *  L手機條碼驗證
 '''
+
+
 class ECPay_CHECK_MOBILE_BARCODE():
     # 所需參數
     parameters = dict({
@@ -1924,11 +2004,11 @@ class ECPay_CHECK_MOBILE_BARCODE():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
         return arParameters
+
     '''
     * 4欄位例外處理方式(送壓碼前)
     '''
@@ -1937,9 +2017,13 @@ class ECPay_CHECK_MOBILE_BARCODE():
         if 'BarCode' in arParameters:
             arParameters['BarCode'] = arParameters['BarCode'].replace('+', ' ')
         return arParameters
+
+
 '''
 *  M愛心碼驗證
 '''
+
+
 class ECPay_CHECK_LOVE_CODE():
     # 所需參數
     parameters = dict({
@@ -1986,7 +2070,6 @@ class ECPay_CHECK_LOVE_CODE():
             if len(arErrors) > 0:
                 raise CustomException
         except CustomException:
-
             print(''.join(arErrors))
             raise
 
@@ -1998,6 +2081,3 @@ class ECPay_CHECK_LOVE_CODE():
 
     def check_exception(self, arParameters=dict):
         return arParameters
-
-
-

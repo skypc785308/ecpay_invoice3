@@ -28,7 +28,7 @@ ecpay_invoice.Send['Items'].append({
     'ItemCount': 1,
     'ItemWord': '批',
     'ItemPrice': 100,
-    'ItemTaxType': '',
+    'ItemTaxType': '1',
     'ItemAmount': 100,
     'ItemRemark': '商品備註一'
 })
@@ -37,7 +37,7 @@ ecpay_invoice.Send['Items'].append({
     'ItemCount': 2,
     'ItemWord': '件',
     'ItemPrice': 200,
-    'ItemTaxType': '',
+    'ItemTaxType': '1',
     'ItemAmount': 400,
     'ItemRemark': '商品備註二'
 })
@@ -57,9 +57,9 @@ ecpay_invoice.Send['Donation'] = '0'
 ecpay_invoice.Send['LoveCode'] = ''
 ecpay_invoice.Send['CarruerType'] = ''
 ecpay_invoice.Send['CarruerNum'] = ''
-ecpay_invoice.Send['TaxType'] = 1
+ecpay_invoice.Send['TaxType'] = '1'
 ecpay_invoice.Send['SalesAmount'] = 500
-ecpay_invoice.Send['InvoiceRemark'] = 'SDK TEST Python V1.0.180302'
+ecpay_invoice.Send['InvoiceRemark'] = 'SDK TEST Python V1.0.6'
 ecpay_invoice.Send['InvType'] = '07'
 ecpay_invoice.Send['DelayFlag'] = '1'
 ecpay_invoice.Send['DelayDay'] = '1'

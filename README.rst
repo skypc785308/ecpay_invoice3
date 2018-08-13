@@ -25,6 +25,8 @@
 
 change log:
 
+2018-08-13 更新CustomerName最大可以到60個字
+
 2018-07-30 Python3 初版
 
 

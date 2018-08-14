@@ -28,7 +28,7 @@ ecpay_invoice.Send['Items'].append({
     'ItemCount': 1,
     'ItemWord': '批',
     'ItemPrice': 100,
-    'ItemTaxType': '1',
+    'ItemTaxType': '',
     'ItemAmount': 100,
     'ItemRemark': '商品備註一'
 })
@@ -37,7 +37,7 @@ ecpay_invoice.Send['Items'].append({
     'ItemCount': 2,
     'ItemWord': '件',
     'ItemPrice': 200,
-    'ItemTaxType': '1',
+    'ItemTaxType': '',
     'ItemAmount': 400,
     'ItemRemark': '商品備註二'
 })

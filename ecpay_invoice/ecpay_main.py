@@ -931,7 +931,7 @@ class ECPay_INVOICE_DELAY():
                     break
                 bFind_Tag = str(val['ItemTaxType']).find('|')
                 if bFind_Tag != -1 or not val['ItemTaxType']:
-                    if arParameters['TaxType'] == EcpayTaxType.Mix:
+                    if arParameters['ItemTaxType'] == EcpayTaxType.Mix:
                         bError_Tag = True
                         arErrors.append('24:Invalid ItemTaxType.')
                         break

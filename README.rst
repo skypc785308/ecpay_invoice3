@@ -27,6 +27,8 @@
 
 change log:
 
+2019-01-07 v1.1.0 修正延遲開立的驗證ItemTaxtType欄位錯誤
+
 2019-01-05 v1.0.9 修正折讓與延遲開立的驗證ItemTaxtType欄位錯誤
 
 2018-08-27 v1.0.8 修正urlencode將空白轉成%20 bug
